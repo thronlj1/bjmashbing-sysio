@@ -57,62 +57,57 @@ public class SocketIOPropertites {
             server.setReuseAddress(REUSE_ADDR);
             server.setSoTimeout(SO_TIMEOUT);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("server up use 9090!");
-        while (true) {
-            try {
-                System.in.read();  //分水岭：
 
-                Socket client = server.accept();
-                System.out.println("client port: " + client.getPort());
+            System.out.println("server up use 9090!");
+            while (true) {
+                try {
+                    System.in.read();  //分水岭：
 
-                client.setKeepAlive(CLI_KEEPALIVE);
-                client.setOOBInline(CLI_OOB);
-                client.setReceiveBufferSize(CLI_REC_BUF);
-                client.setReuseAddress(CLI_REUSE_ADDR);
-                client.setSendBufferSize(CLI_SEND_BUF);
-                client.setSoLinger(CLI_LINGER, CLI_LINGER_N);
-                client.setSoTimeout(CLI_TIMEOUT);
-                client.setTcpNoDelay(CLI_NO_DELAY);
+                    Socket client = server.accept();
+                    System.out.println("client port: " + client.getPort());
 
-                new Thread(
-                        () -> {
-                            while (true) {
-                                try {
-                                    InputStream in = client.getInputStream();
-                                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                                    char[] data = new char[1024];
-                                    int num = reader.read(data);
+                    client.setKeepAlive(CLI_KEEPALIVE);
+                    client.setOOBInline(CLI_OOB);
+                    client.setReceiveBufferSize(CLI_REC_BUF);
+                    client.setReuseAddress(CLI_REUSE_ADDR);
+                    client.setSendBufferSize(CLI_SEND_BUF);
+                    client.setSoLinger(CLI_LINGER, CLI_LINGER_N);
+                    client.setSoTimeout(CLI_TIMEOUT);
+                    client.setTcpNoDelay(CLI_NO_DELAY);
 
-                                    if (num > 0) {
-                                        System.out.println("client read some data is :" + num + " val :" + new String(data, 0, num));
-                                    } else if (num == 0) {
-                                        System.out.println("client readed nothing!");
-                                        continue;
-                                    } else {
-                                        System.out.println("client readed -1...");
-                                        client.close();
-                                        break;
+                    new Thread(
+                            () -> {
+                                while (true) {
+                                    try {
+                                        InputStream in = client.getInputStream();
+                                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                                        char[] data = new char[1024];
+                                        int num = reader.read(data);
+
+                                        if (num > 0) {
+                                            System.out.println("client read some data is :" + num + " val :" + new String(data, 0, num));
+                                        } else if (num == 0) {
+                                            System.out.println("client readed nothing!");
+                                            continue;
+                                        } else {
+                                            System.out.println("client readed -1...");
+                                            client.close();
+                                            break;
+                                        }
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
                                     }
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
                                 }
                             }
-                        }
-                ).start();
+                    ).start();
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }finally {
-                try {
-                    server.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
